@@ -1,0 +1,75 @@
+pipeline{
+    agent any
+    tools{
+        maven 'myMaven'
+    }
+    stages{
+        stage("Code"){
+            steps{
+                git branch: 'main', url: 'https://github.com/Apsana-Syed-281999/docker-webapp-k8s-new-class.git'
+            }
+        }
+        stage("CQA"){
+            steps{
+                withSonarQubeEnv('mySonar') {
+                        sh '''
+                            mvn -B clean verify \
+                              org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                              -Dsonar.projectKey=My_Sonar_Project \
+                              -Dsonar.host.url=http://54.91.35.128:1111 \
+                              -Dsonar.token=sqp_32649ec9e5ae4ce1ee58f6094a077affee205ab9
+                       '''
+                }
+
+            }
+        }
+        stage("Quality Gate"){
+             steps{
+                 waitForQualityGate abortPipeline: true, credentialsId: 'sonar-credentials'
+             }
+         }   
+        stage("Build"){
+            steps{
+                sh 'mvn clean package'
+            }
+        } 
+        stage("Artifacts"){
+            steps{
+                echo 'Implement later'
+            }
+        }
+        stage("Image Build"){
+            steps{
+                sh 'docker build -t dbimg ./Docker-db'
+                sh 'docker build -t appimg .'
+            }
+        }
+        stage("Scan Image"){
+            steps{
+                sh 'trivy dbimg'
+                sh 'trivy appimg'
+            }
+        }
+        stage("Image tag"){
+            steps{
+                sh 'docker tag appimg apsanadevops/docker-webapp-new:appimg'
+                sh 'docker tag dbimg apsanadevops/docker-webapp-new:dbimg'
+            }
+        }
+        stage("Image Push"){
+            steps{
+                script{
+                    withDockerRegistry(credentialsId: 'docker-credentials') {
+                       sh 'docker push apsanadevops/docker-webapp-new:dbimg'
+                       sh 'docker push apsanadevops/docker-webapp-new:appimg'
+                    }                   
+                }
+            }
+        }
+        stage("Deploy"){
+            steps{
+                sh 'docker-compose up -d'
+            }
+        }
+    }
+}
