@@ -6,7 +6,7 @@ pipeline{
     stages{
         stage("Code"){
             steps{
-                git branch: 'main', url: 'https://github.com/Apsana-Syed-281999/docker-webapp-k8s-new-class.git'
+                git branch: 'e-commerce-new-class', url: 'https://github.com/Apsana-Syed-281999/Kuberenetes-Practice-files-Projects.git'
             }
         }
         stage("CQA"){
