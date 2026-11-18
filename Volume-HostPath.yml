@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deply1
+spec:
+  selector:
+    matchLabels:
+      app: zomato
+  replicas: 3
+  template:
+    metadata:
+      name: tmplt1
+      labels:
+        app: zomato
+    spec:
+      containers:
+        - name: con1
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /aps
+              name: vol1
+
+        - name: helper
+          image: nginx
+          ports:
+            - containerPort: 80
+          command: ["/bin/bash", "-c", "sleep 1000"]
+          volumeMounts:
+            - mountPath: /aps
+              name: vol1
+
+      volumes:
+        - hostPath:
+            path: /apsana
+          name: vol1

@@ -1,0 +1,131 @@
+#Note: All pod belongs to same namespace.
+Did this in kops, however the kops default using cilium, so didn't use calico for networking.
+
+#Pod-1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-1
+  labels:
+    app: makeup
+spec:
+  containers:
+    - image: apsanadevops/beauty:makeup
+      name: con-1
+      ports:
+        - containerPort: 80
+
+
+#Pod-2
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-2
+  labels:
+    app: jewels
+spec:
+  containers:
+    - image: apsanadevops/beauty:jewels
+      name: con-1
+      ports:
+        - containerPort: 80
+
+
+#Pod-3
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-3
+  labels:
+    app: shoes
+spec:
+  containers:
+    - image: apsanadevops/beauty:shoes
+      name: con-1
+      ports:
+        - containerPort: 80
+
+
+#Deny-all  -> Denying all communication b/w all pods
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+
+
+#### Enabling communication b/w pod1 and pod2 alone ###
+# pod1-makeup-ingress-egree  ->  deciding which pod can send data to pod1 and to which Pod, pod1's data can be sent to.
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: makeup-comm
+spec:
+  podSelector:
+    matchLabels:
+      app: makeup
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+             matchLabels:
+                app: jewels
+        - ipBlock:
+            cidr: 100.96.1.0/24
+            except:
+              - 100.96.1.210/32
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: jewels
+        - ipBlock:
+            cidr: 100.96.1.0/24 
+            except:
+              - 100.96.1.210/32
+      
+
+
+# pod2-jewels-ingress-egree  ->  deciding which pod can send data to pod2 and to which Pod, pod1's data can be sent to.
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: jewels-comm
+spec:
+  podSelector:
+    matchLabels:
+      app: jewels
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: makeup
+        - ipBlock:
+            cidr: 100.96.2.0/24
+            except:
+              - 100.96.2.139/32
+
+  egress:
+    - to:
+      - podSelector:
+          matchLabels:
+            app: makeup
+        - ipBlock:
+            cidr: 100.96.2.0/24
+            except:
+              - 100.96.2.139/32

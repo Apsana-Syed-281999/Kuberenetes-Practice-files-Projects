@@ -1,0 +1,30 @@
+#repo -> something taken from helm.sh
+
+helm repo add name url
+helm repo ls
+helm repo update
+helm repo rm name
+
+
+
+#release -> something we created
+helm create helm_name
+helm install release-name .
+helm upgrade release-name .
+helm delete release-name      # or   helm uninstall release-name
+ 
+helm ls
+helm history release-name
+helm rollback release-name version-number
+
+
+#pack and put in git
+helm lint helm-name
+helm package helm-name
+helm repo index .
+
+#push it repo and get link
+helm repo add repo-name above-url
+helm repo update
+helm repo ls
+helm install release-name repo-name/previos-helm-name

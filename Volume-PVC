@@ -1,0 +1,101 @@
+# However with belowmethod in kops cluster, all Pods are getting created in only one node.
+# Alternative way to get schedule them in multiple node is by using AWS EFS instead of EBS, and when we use EFS we need to use ReadWriteMany instead of ReadWriteOnce in both pv and pvc.yml
+# Another Alternative was to add storageClassName: manual in both pv and pvc, everything is fine meaning pv, pvc and deploy got created, claim looks fine, even pods are scheduled to multiple node, but however Pods are not running bcz volume attach is not happening.
+
+#### Answer #### use dynamic method ####
+###### The new EBS gets created in the same zone as where the first Pod is created by scheduler, say if we have 2 nodes, when we execute deploy, if scheduler schedules Pod in node A, then EBS will be present in same zone as nodeA, vice versa
+##### As mentioned earlier, The new EBS gets created in the same zone as where the first Pod is created by scheduler,Assume the EBS is present in zone-a, bcz the node having our first pod is also in zone-a, since our EBS is specific to our zone-a, it made the scheduler to schedule all pods in same zone,
+
+### storage class ###
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: my-sc
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp3
+  fsType: ext4
+  encrypted: "true"
+  iops: "3000"
+  throughput: "125"
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+
+
+
+#PVC File
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc1
+spec:
+  storageClassName: my-sc
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+
+
+#Deploy using PVC
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deply1
+spec:
+  selector:
+    matchLabels:
+      app: zomato
+  replicas: 3
+  template:
+    metadata:
+      name: tmplt1
+      labels:
+        app: zomato
+    spec:
+      containers:
+        - name: con1
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /aps
+              name: vol1
+
+        - name: helper
+          image: nginx
+          ports:
+            - containerPort: 80
+          command: ["/bin/bash", "-c", "sleep 1000"]
+          volumeMounts:
+            - mountPath: /aps
+              name: vol1
+
+      volumes:
+        - persistentVolumeClaim:
+            claimName: pvc1
+          name: vol1
+
+
+#PV File ### Not needed for dynamic method
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv1
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  awsElasticBlockStore:
+    volumeID: vol-0802a122e8b84d4f9
+    fsType: ext4
+

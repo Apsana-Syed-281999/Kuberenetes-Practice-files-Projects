@@ -1,0 +1,43 @@
+##ReadinessProbe
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-1
+  labels:
+    app: makeup
+spec:
+  containers:
+    - image: apsanadevops/beauty:makeup
+      name: con-1
+      ports:
+        - containerPort: 80
+      command: ["/bin/bash", "-c", "touch /tmp/flm; sleep 1000"]
+      readinessProbe:
+        exec:
+          command: ["cat", "/tmp/flm"]
+        initialDelaySeconds: 5
+        periodSeconds: 3
+        timeoutSeconds: 6
+
+##LivenessProbe
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-1
+  labels:
+    app: makeup
+spec:
+  containers:
+    - image: apsanadevops/beauty:makeup
+      name: con-1
+      ports:
+        - containerPort: 80
+      command: ["/bin/bash", "-c", "touch /tmp/flm; sleep 1000"]
+      livenessProbe:
+        exec:
+          command: ["cat", "/tmp/flm"]
+        initialDelaySeconds: 5
+        periodSeconds: 3
+        timeoutSeconds: 6

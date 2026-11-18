@@ -1,0 +1,3 @@
+Task-1
+Create img, push it to private repo, create a secret file to access the dockerhub private repo where img is present, it should have url, username and token, and then create a pod with this private img
+

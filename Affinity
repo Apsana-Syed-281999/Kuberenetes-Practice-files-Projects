@@ -1,0 +1,149 @@
+
+##NodeAffinity
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sts2
+spec:
+  selector:
+    matchLabels:
+      app: makeup
+  replicas: 3
+  template:
+    metadata:
+      name: tmplt1
+      labels:
+        app: makeup
+    spec:
+      containers:
+        - name: con1
+          image: apsanadevops/beauty:makeup
+          ports:
+            - containerPort: 80
+
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: env
+                    operator: In
+                    values:
+                      - dev
+
+                  - key: env
+                    operator: NotIn
+                    values:
+                    - test
+
+
+
+
+
+
+####PodAffinity Single label
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sts3
+spec:
+  selector:
+    matchLabels:
+      app: makeup
+  replicas: 3
+  template:
+    metadata:
+      name: tmplt1
+      labels:
+        app: makeup
+    spec:
+      containers:
+        - name: con1
+          image: apsanadevops/beauty:makeup
+          ports:
+            - containerPort: 80
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: jewels
+              topologyKey: kubernetes.io/hostname
+
+
+
+
+
+
+### Pod Affinity multiple labels
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sts3
+spec:
+  selector:
+    matchLabels:
+      app: makeup
+  replicas: 3
+  template:
+    metadata:
+      name: tmplt1
+      labels:
+        app: makeup
+    spec:
+      containers:
+        - name: con1
+          image: apsanadevops/beauty:makeup
+          ports:
+            - containerPort: 80
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - shoes
+                      - jewels
+              topologyKey: kubernetes.io/hostname
+
+
+
+### Pod Anti-Affinity multiple labels
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sts3
+spec:
+  selector:
+    matchLabels:
+      app: makeup
+  replicas: 3
+  template:
+    metadata:
+      name: tmplt1
+      labels:
+        app: makeup
+    spec:
+      containers:
+        - name: con1
+          image: apsanadevops/beauty:makeup
+          ports:
+            - containerPort: 80
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - shoes
+                      - jewels
+              topologyKey: kubernetes.io/hostname
+

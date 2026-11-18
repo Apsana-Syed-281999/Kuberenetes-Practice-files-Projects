@@ -1,0 +1,26 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deply1
+spec:
+  selector:
+    matchLabels:
+      app: makeup
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 2
+  template:
+    metadata:
+      name: tmplt1
+      labels:
+        app: makeup
+    spec:
+      containers:
+        - name: con1
+          image: apsanadevops/beauty:shoes
+          ports:
+            - containerPort: 80

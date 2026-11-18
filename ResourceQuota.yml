@@ -1,0 +1,35 @@
+##ResourceQuota
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: rsrc1
+spec:
+  hard:
+    limits.cpu: "600m"
+    limits.memory: "600Mi"
+    requests.cpu: "200m"
+    requests.memory: "200Mi"
+
+
+###Pod with Resources
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-1
+  labels:
+    app: makeup
+spec:
+  containers:
+    - image: apsanadevops/beauty:makeup
+      name: con-1
+      ports:
+        - containerPort: 80
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "100Mi"
+        requests:
+          cpu: "50m"
+          memory: "50Mi"

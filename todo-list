@@ -1,0 +1,9 @@
+create Deploy for app-containers and statefulset for db-containers and see whether the data in db Pods are present.
+Use daemonset pod to either monitor or atleast install git in pods.
+Use private image for deploy 
+Practice volumes, network and RBAC on kops(currently doing on minikube) 
+		#However the RBAC is not going to be our job in real time, bcz it will be taken care by administrator.
+		#Tried volumes in kops, Without StorageClassName in pv and pvc -> pv, pvc, deploy and it's pod got created. But all pod got created in same node then how to check the volume working
+							    After using storageClassName in pv and pvc -> pv, pvc, deploy and it's pod got scheduled on multiple node. But no pod are running -> Failed to attach volume.
+		#Tried network with kops ->Works fine, however for different NS, we need to allow http, DNS just like in minikube
+Canary-Deployment-Strategies -> learn Gateway API HTTPRoute aswell

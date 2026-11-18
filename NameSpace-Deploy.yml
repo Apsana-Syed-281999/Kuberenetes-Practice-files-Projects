@@ -1,0 +1,39 @@
+###Namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prod
+
+
+
+#kubectl create ns ns_name
+
+
+####Deploy with Namespace
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dply1
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: makeup
+      env: dev
+  replicas: 3
+  template:
+    metadata:
+      name: tmplt1
+      labels:
+        app: makeup
+        env: dev
+    spec:
+      containers:
+        - image: apsanadevops/beauty:makeup
+          name: con-1
+          ports:
+            - containerPort: 80
+
+

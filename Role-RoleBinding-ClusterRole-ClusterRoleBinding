@@ -1,0 +1,80 @@
+###clusterRole
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: crole1
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["create", "watch", "get", "list", "delete"]
+
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["create", "watch", "get", "list"]
+
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["create", "watch", "get", "list", "delete"]
+
+
+#wrote the deployments and replicas seperately from Pods though the verbs are same, bcz the apiGroups for deployments and replicasets is apps, where as for pods it is empty.
+#wrote the services seperately from Pods though the apiGroups is same, bcz the verbs for services and pods are diffrent.
+
+###ClusterRoleBinding
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: crolebind1
+subjects:
+  - kind: User
+    name: apsana
+    apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: ClusterRole
+  name: crole1
+  apiGroup: rbac.authorization.k8s.io
+
+
+###Role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: role1
+  namespace: dev
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["create", "watch", "get", "list", "delete"]
+
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["create", "watch", "get", "list"]
+
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["create", "watch", "get", "list", "delete"]
+
+
+#wrote the deployments and replicas seperately from Pods though the verbs are same, bcz the apiGroups for deployments and replicasets is apps, where as for pods it is empty.
+#wrote the services seperately from Pods though the apiGroups is same, bcz the verbs for services and pods are diffrent.
+
+###RoleBinding
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rolebind1
+  namespace: dev
+subjects:
+  - kind: User
+    name: apsana
+    apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: Role
+  name: role1
+  apiGroup: rbac.authorization.k8s.io

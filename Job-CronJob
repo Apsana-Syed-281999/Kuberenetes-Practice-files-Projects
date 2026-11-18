@@ -1,0 +1,47 @@
+
+### Single Job
+---
+apiVersion:  batch/v1
+kind: Job
+metadata:
+  name: job1
+spec:
+  template:
+    metadata:
+      name: tmplt1
+      labels:
+        app: swiggy
+    spec:
+      restartPolicy: Never
+      containers:
+        - image: nginx
+          name: con-1
+          ports:
+            - containerPort: 80
+          command: ["/bin/bash", "-c", "sleep 10"]
+
+
+
+###Schedules Cron Job
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cjob1
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          name: tmplt1
+          labels:
+            app: shoes
+        spec:
+         restartPolicy: Never
+         containers:
+          - image: apsanadevops/beauty:makeup
+            name: con-1
+            ports:
+              - containerPort: 80
+            command: ["/bin/bash", "-c", "sleep 5"]

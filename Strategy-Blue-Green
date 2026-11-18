@@ -1,0 +1,66 @@
+#Blue deploy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deply1
+spec:
+  selector:
+    matchLabels:
+      app: jewels
+      env: blue
+  replicas: 3
+  template:
+    metadata:
+      name: tmplt1
+      labels:
+        app: jewels
+        env: blue
+    spec:
+      containers:
+        - name: con1
+          image: apsanadevops/beauty:jewels
+          ports:
+            - containerPort: 80
+
+
+#Green Deploy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deply2
+spec:
+  selector:
+    matchLabels:
+      app: makeup
+      env: green
+  replicas: 3
+  template:
+    metadata:
+      name: tmplt1
+      labels:
+        app: makeup
+        env: green
+    spec:
+      containers:
+        - name: con1
+          image: apsanadevops/beauty:makeup
+          ports:
+            - containerPort: 80
+
+
+#Service
+# change the label env from blue to green 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc1
+spec:
+  type: LoadBalancer
+  selector:
+    env: blue
+  ports:
+    - port: 80
+      targetPort: 80
